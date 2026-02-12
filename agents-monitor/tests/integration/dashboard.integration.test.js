@@ -9,10 +9,23 @@ const path = require('path');
 describe('Dashboard Integration', () => {
   let dashboardProcess;
 
-  afterEach(() => {
+  afterEach((done) => {
     // Clean up - kill dashboard if still running
     if (dashboardProcess && !dashboardProcess.killed) {
       dashboardProcess.kill('SIGTERM');
+      // Wait for process to fully exit before moving to next test
+      const exitHandler = () => {
+        // Add delay to allow OS to fully clean up resources
+        setTimeout(done, 100);
+      };
+      dashboardProcess.once('exit', exitHandler);
+      // Failsafe timeout
+      setTimeout(() => {
+        dashboardProcess.removeListener('exit', exitHandler);
+        done();
+      }, 1000);
+    } else {
+      done();
     }
   });
 
@@ -79,6 +92,8 @@ describe('Dashboard Integration', () => {
   }, 10000);
 
   it('should keep dashboard running (not exit immediately)', (done) => {
+    let doneCalled = false;
+
     dashboardProcess = spawn('node', ['src/index.js', 'start'], {
       cwd: path.join(__dirname, '../../'),
       env: {
@@ -89,35 +104,34 @@ describe('Dashboard Integration', () => {
       stdio: ['pipe', 'pipe', 'pipe']
     });
 
-    let processExited = false;
-
-    dashboardProcess.on('exit', (code) => {
-      processExited = true;
+    // Attach listeners immediately after spawn
+    const exitHandler = (code) => {
       if (!doneCalled) {
-        done(new Error(`Process exited with code ${code}`));
         doneCalled = true;
+        done(new Error(`Process exited unexpectedly with code ${code}`));
       }
-    });
+    };
 
-    dashboardProcess.on('error', (error) => {
+    const errorHandler = (error) => {
       if (!doneCalled) {
+        doneCalled = true;
         done(error);
-        doneCalled = true;
       }
-    });
+    };
+
+    dashboardProcess.on('exit', exitHandler);
+    dashboardProcess.on('error', errorHandler);
 
     // After 2 seconds, check if process is still alive
-    let doneCalled = false;
     const checkTimeout = setTimeout(() => {
       if (!doneCalled) {
-        if (processExited) {
-          done(new Error('Process exited before test check'));
-          doneCalled = true;
-        } else if (dashboardProcess.exitCode === null && !dashboardProcess.killed) {
+        if (dashboardProcess.exitCode === null && !dashboardProcess.killed) {
           // Process is still alive - success!
+          doneCalled = true;
+          dashboardProcess.removeListener('exit', exitHandler);
+          dashboardProcess.removeListener('error', errorHandler);
           dashboardProcess.kill('SIGTERM');
           done();
-          doneCalled = true;
         }
       }
     }, 2000);
@@ -125,12 +139,15 @@ describe('Dashboard Integration', () => {
     // Safeguard timeout
     const safeTimeout = setTimeout(() => {
       if (!doneCalled) {
-        dashboardProcess.kill('SIGTERM');
-        done(new Error('Test timeout'));
         doneCalled = true;
+        if (dashboardProcess && !dashboardProcess.killed) {
+          dashboardProcess.kill('SIGTERM');
+        }
+        done(new Error('Test timeout - process never became ready'));
       }
     }, 5000);
 
+    // Cleanup
     dashboardProcess.on('exit', () => {
       clearTimeout(checkTimeout);
       clearTimeout(safeTimeout);
