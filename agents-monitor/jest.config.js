@@ -1,7 +1,3 @@
-// Debug: Log Jest environment
-console.log('[Jest Config] CI environment:', process.env.CI);
-console.log('[Jest Config] GITHUB_ACTIONS environment:', process.env.GITHUB_ACTIONS);
-
 module.exports = {
   testEnvironment: 'node',
   coverageDirectory: 'coverage',
@@ -20,12 +16,9 @@ module.exports = {
     }
   },
   testMatch: [
-    '<rootDir>/tests/**/*.test.js',
-    '<rootDir>/tests/**/*.spec.js'
+    '**/tests/**/*.test.js',
+    '**/tests/**/*.spec.js'
   ],
-  // Explicitly roots the test discovery to tests directory
-  // This prevents accidental test discovery in node_modules or other locations
-  // and ensures consistent behavior across different environments
   testPathIgnorePatterns: [
     '/node_modules/',
     '/dist/'
@@ -37,9 +30,7 @@ module.exports = {
   verbose: true,
   bail: false,
   errorOnDeprecated: true,
-  // Force Jest to exit even if there are open handles
-  // This is necessary because the keep-alive interval in dashboard tests
-  // and subprocess handling can leave event handles active
+  // Force Jest to exit - necessary for subprocess cleanup in dashboard tests
   forceExit: true,
   // Limit workers in CI environments to avoid resource contention
   // This helps Jest discover and run all test files consistently
