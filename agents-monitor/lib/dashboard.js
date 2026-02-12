@@ -24,22 +24,27 @@ class Dashboard {
    * Initialize the dashboard
    */
   async init() {
-    // Create the blessed screen with terminal compatibility fixes
-    this.screen = blessed.screen({
-      smartCSR: true,
-      mouse: false, // Disable mouse to avoid terminal issues
-      title: 'Claude Code Agents Monitor',
-      useStyle: true,
-      dockBorders: true,
-    });
+    try {
+      // Create the blessed screen with terminal compatibility fixes
+      this.screen = blessed.screen({
+        smartCSR: true,
+        mouse: false, // Disable mouse to avoid terminal issues
+        title: 'Claude Code Agents Monitor',
+        useStyle: true,
+        dockBorders: true,
+      });
 
-    // Create main layout
-    this.createLayout();
+      // Create main layout
+      this.createLayout();
 
-    // Handle keyboard shortcuts
-    this.setupKeyboardHandlers();
+      // Handle keyboard shortcuts
+      this.setupKeyboardHandlers();
 
-    console.log('✅ Dashboard initialized');
+      console.log('✅ Dashboard initialized');
+    } catch (error) {
+      console.error('❌ Error during initialization:', error.message);
+      throw error;
+    }
   }
 
   /**
@@ -173,31 +178,54 @@ class Dashboard {
    * Start the dashboard
    */
   async start() {
-    this.running = true;
-    console.log('✅ Dashboard started. Press q to quit.');
+    try {
+      this.running = true;
+      console.log('✅ Dashboard started. Press q to quit.');
 
-    // Initial update
-    await this.updateDashboard();
+      // Initial update
+      await this.updateDashboard();
 
-    // Setup refresh interval
-    this.refreshInterval = setInterval(async () => {
-      if (this.running) {
-        await this.updateDashboard();
+      // Setup refresh interval
+      this.refreshInterval = setInterval(async () => {
+        if (this.running) {
+          try {
+            await this.updateDashboard();
+          } catch (error) {
+            console.error('Error updating dashboard:', error.message);
+          }
+        }
+      }, this.options.refreshInterval);
+
+      // Render the screen
+      this.screen.render();
+
+      // Keep the process alive - CRITICAL for blessed to work
+      // stdin.resume() keeps the event loop active for keyboard input
+      process.stdin.resume();
+
+      // Handle exit signals gracefully
+      if (!process.listeners('SIGINT').length) {
+        process.on('SIGINT', () => {
+          this.running = false;
+          clearInterval(this.refreshInterval);
+          this.screen.destroy();
+          process.exit(0);
+        });
       }
-    }, this.options.refreshInterval);
 
-    // Render the screen
-    this.screen.render();
-
-    // Keep the process alive - prevent exit until user quits
-    // blessed keeps stdin open, but ensure we don't exit prematurely
-    if (!process.listeners('SIGINT').length) {
-      process.on('SIGINT', () => {
-        this.running = false;
-        clearInterval(this.refreshInterval);
-        this.screen.destroy();
-        process.exit(0);
-      });
+      // Also handle SIGTERM
+      if (!process.listeners('SIGTERM').length) {
+        process.on('SIGTERM', () => {
+          this.running = false;
+          clearInterval(this.refreshInterval);
+          this.screen.destroy();
+          process.exit(0);
+        });
+      }
+    } catch (error) {
+      console.error('❌ Error starting dashboard:', error.message);
+      console.error(error.stack);
+      process.exit(1);
     }
   }
 
