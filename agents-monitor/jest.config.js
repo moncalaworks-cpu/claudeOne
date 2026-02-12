@@ -33,5 +33,9 @@ module.exports = {
   // Force Jest to exit even if there are open handles
   // This is necessary because the keep-alive interval in dashboard tests
   // and subprocess handling can leave event handles active
-  forceExit: true
+  forceExit: true,
+  // Limit workers in CI environments to avoid resource contention
+  // This helps Jest discover and run all test files consistently
+  // In GitHub Actions, 1-2 workers work better than auto (which can cause issues)
+  maxWorkers: process.env.CI ? 2 : '50%'
 };
