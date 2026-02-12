@@ -12,25 +12,48 @@ describe('Dashboard Integration', () => {
   afterEach((done) => {
     // Clean up - kill dashboard if still running
     if (dashboardProcess && !dashboardProcess.killed) {
+      // Pause all listeners to prevent events from queuing up
+      dashboardProcess.pause();
+
       dashboardProcess.kill('SIGTERM');
       let exited = false;
 
       // Wait for process to fully exit
       const exitHandler = () => {
         exited = true;
-        // Add delay to allow OS to fully clean up resources
-        setTimeout(() => done(), 100);
+        // Clean up all listeners to ensure no dangling handlers
+        dashboardProcess.removeAllListeners('exit');
+        dashboardProcess.removeAllListeners('error');
+        dashboardProcess.removeAllListeners('close');
+        // Add delay to allow OS to fully clean up resources and port release
+        setTimeout(() => done(), 200);
+      };
+
+      const errorHandler = () => {
+        // Handle process errors
+        if (!exited) {
+          exited = true;
+          dashboardProcess.removeAllListeners();
+          setTimeout(() => done(), 200);
+        }
       };
 
       dashboardProcess.once('exit', exitHandler);
+      dashboardProcess.once('error', errorHandler);
 
-      // Failsafe timeout
+      // Force kill if not exited after 2 seconds
       setTimeout(() => {
         if (!exited) {
-          dashboardProcess.removeListener('exit', exitHandler);
+          exited = true;
+          try {
+            dashboardProcess.kill('SIGKILL');
+          } catch (e) {
+            // Process may already be dead
+          }
+          dashboardProcess.removeAllListeners();
           done();
         }
-      }, 1500);
+      }, 2000);
     } else {
       done();
     }
