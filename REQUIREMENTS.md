@@ -351,6 +351,27 @@ Enhancements and advanced monitoring for production deployments.
   - Workflow rules now require tests for all code work (Rule 2)
   - 653 lines added (6 files: jest.config.js, tests/setup.js, agents.test.js, metrics.test.js, test-and-coverage.yml, TESTING.md)
 
+#### REQ-011.1: Fix npm start to launch dashboard properly (Bug Fix)
+- **Description:** Fix npm start command to actually launch the monitoring dashboard instead of showing help menu.
+- **Status:** DONE ✅
+- **GitHub Issue:** #24
+- **Fix:** Updated package.json scripts to pass 'start' argument
+- **Verification:** ✅ npm start launches dashboard, 70/70 tests pass
+
+#### REQ-011.2: Fix dashboard terminal compatibility issues (Bug Fix)
+- **Description:** Fix terminal rendering issues with the blessed library on xterm-256color terminals.
+- **Status:** DONE ✅
+- **GitHub Issue:** #25
+- **Fix:** Disabled mouse support, added useStyle and dockBorders options
+- **Verification:** ✅ Dashboard initializes, 70/70 tests pass
+
+#### REQ-014.1: Fix alert CLI commands routing (Bug Fix)
+- **Description:** Fix alert CLI commands (list, rules, stats, history) which were not routing correctly due to conflicting command definitions in Commander.js.
+- **Status:** DONE ✅
+- **GitHub Issue:** #26
+- **Fix:** Refactored to single unified alerts command with subcommand routing
+- **Verification:** ✅ All alert commands working, 70/70 tests pass
+
 ---
 
 ## Dependencies & Constraints
