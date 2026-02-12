@@ -1,0 +1,1 @@
+Issue #24 - REQ-011.1: Fix npm start to launch dashboard properly
