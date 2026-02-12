@@ -382,6 +382,21 @@ Enhancements and advanced monitoring for production deployments.
   5. ✅ Dashboard displays required UI elements (254ms)
 - **Verification:** ✅ All 5 integration tests pass, dashboard properly stays open for user interaction
 
+#### REQ-011.4: Fix blessed rendering errors in dashboard (Bug Fix)
+- **Description:** Fix "String.prototype.bold called on null or undefined" crash when dashboard UI renders. Identified because integration tests weren't comprehensive enough to catch the error.
+- **Status:** DONE ✅
+- **GitHub Issue:** #31
+- **Root Causes Found:**
+  1. metricsBox and perfBox created without initial content (null/undefined values)
+  2. Blessed markup tags ({green}...{/green}) causing parser failures
+  3. Integration tests too short - only checked 2-3 seconds before rendering crash
+- **Fix Applied:**
+  - Added initial content to metricsBox and perfBox boxes
+  - Removed all blessed markup tags from getBar() and updateMetrics()
+  - Enhanced integration tests to wait 4 seconds and specifically detect rendering errors
+  - Added detection for String.prototype.bold and blessed-specific errors
+- **Verification:** ✅ Dashboard runs without crashes, all 5 integration tests pass with improved error detection
+
 #### REQ-014.1: Fix alert CLI commands routing (Bug Fix)
 - **Description:** Fix alert CLI commands (list, rules, stats, history) which were not routing correctly due to conflicting command definitions in Commander.js.
 - **Status:** DONE ✅
