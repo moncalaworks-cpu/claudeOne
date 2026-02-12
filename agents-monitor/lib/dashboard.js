@@ -236,10 +236,18 @@ class Dashboard {
         });
       }
 
+      // Set up dummy interval to keep event loop active
+      // This prevents Node.js from exiting even if there are no other active handles
+      // eslint-disable-next-line no-unused-vars
+      const keepAliveInterval = setInterval(() => {
+        // Dummy operation - just to keep the event loop running
+      }, 1000);
+
       // Return a promise that never resolves - keeps the dashboard running indefinitely
       // This ensures the process stays alive and doesn't exit after start() completes
       return new Promise(() => {
         // Never resolve - dashboard runs until process is killed
+        // Keep-alive interval ensures event loop stays active
       });
     } catch (error) {
       console.error('❌ Error starting dashboard:', error.message);
