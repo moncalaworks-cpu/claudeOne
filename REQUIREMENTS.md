@@ -365,6 +365,23 @@ Enhancements and advanced monitoring for production deployments.
 - **Fix:** Disabled mouse support, added useStyle and dockBorders options
 - **Verification:** ✅ Dashboard initializes, 70/70 tests pass
 
+#### REQ-011.3: Add integration tests for dashboard lifecycle (Bug Fix)
+- **Description:** Create integration tests to verify dashboard starts, stays running, and responds to signals. Tests also verify that dashboard process doesn't exit immediately.
+- **Status:** DONE ✅
+- **GitHub Issue:** #29 (PR #30 merged)
+- **Fix:**
+  - Returned Promise that never resolves from start() to keep event loop active
+  - Changed startup messages to stderr to avoid buffering when captured by subprocess
+  - Disabled blessed altScreen in test environment for output capture
+  - Added explicit stdio: 'pipe' option to spawn calls
+- **Test Coverage:** 5 integration tests (100% passing)
+  1. ✅ Dashboard starts without errors (274ms)
+  2. ✅ Dashboard stays running (not exit immediately) (2506ms)
+  3. ✅ Dashboard doesn't crash on startup (3008ms)
+  4. ✅ Dashboard responds to keyboard interrupt (Ctrl+C) (782ms)
+  5. ✅ Dashboard displays required UI elements (254ms)
+- **Verification:** ✅ All 5 integration tests pass, dashboard properly stays open for user interaction
+
 #### REQ-014.1: Fix alert CLI commands routing (Bug Fix)
 - **Description:** Fix alert CLI commands (list, rules, stats, history) which were not routing correctly due to conflicting command definitions in Commander.js.
 - **Status:** DONE ✅
