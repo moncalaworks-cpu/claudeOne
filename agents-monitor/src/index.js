@@ -103,17 +103,21 @@ program
   .description('Show performance metrics')
   .action(async () => {
     try {
-      const monitor = new AgentMonitor();
-      const metrics = await monitor.getMetrics();
+      const metrics = new (require('../lib/metrics'))();
+      const data = await metrics.getMetrics();
 
       console.log('\n📈 Performance Metrics:');
       console.log('======================\n');
-      console.log(`Total Agents: ${metrics.totalAgents}`);
-      console.log(`Active Agents: ${metrics.activeAgents}`);
-      console.log(`Failed Agents: ${metrics.failedAgents}`);
-      console.log(`Total Tokens Used: ${metrics.totalTokensUsed}`);
-      console.log(`Avg Execution Time: ${metrics.avgExecutionTime}ms`);
-      console.log(`Success Rate: ${metrics.successRate}%`);
+      console.log(`Total Agents: ${data.totalAgents}`);
+      console.log(`Active Agents: ${data.activeAgents}`);
+      console.log(`Stopped Agents: ${data.stoppedAgents}`);
+      console.log(`Total Tokens Used: ${data.totalTokensUsed}`);
+      console.log(`Total Executions: ${data.totalExecutions}`);
+      console.log(`Success Rate: ${data.successRate}%`);
+      console.log(`\nUptime:`);
+      if (data.uptime.longestRunning) {
+        console.log(`  Longest Running: ${data.uptime.longestRunning.agent} (${data.uptime.longestRunning.uptime}s)`);
+      }
     } catch (error) {
       console.error('❌ Error fetching metrics:', error.message);
       process.exit(1);
