@@ -75,16 +75,18 @@ Core features needed for initial launch. These block the project from being usab
 #### REQ-003: Best Practices Rules (Cursorrules)
 - **Description:** Create and maintain `.cursorrules` file documenting best practices rules that Claude Code automatically applies to this repository.
 - **Acceptance Criteria:**
-  - [ ] CRAFT framework rules documented
-  - [ ] Hallucination mitigation strategies outlined
-  - [ ] MCP integration patterns specified
-  - [ ] Security requirements documented
-  - [ ] State management patterns specified
-  - [ ] Logging and monitoring standards defined
-  - [ ] Code organization conventions specified
+  - [x] CRAFT framework rules documented
+  - [x] Hallucination mitigation strategies outlined
+  - [x] MCP integration patterns specified
+  - [x] Security requirements documented
+  - [x] State management patterns specified
+  - [x] Logging and monitoring standards defined
+  - [x] Code organization conventions specified
 - **Dependencies:** None
 - **Constraints:** Rules must be actionable and auto-applicable
-- **Status:** IN_PROGRESS
+- **Status:** DONE ✅
+- **Closed Date:** 2026-02-12
+- **GitHub Issue:** #3 (PR #13 merged)
 - **Related Memory:** See `conventions.md` for project conventions
 - **Estimated Effort:** Medium
 - **Target Date:** 2026-02-25
