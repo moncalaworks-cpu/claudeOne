@@ -266,6 +266,59 @@ Enhancements and advanced monitoring for production deployments.
   - Clear reasoning provided in analysis comments
   - Tested and working with REQ-011 and REQ-012 issues
 
+#### REQ-013: Web-Based Monitoring Dashboard (Phase 2 Enhancement)
+- **Description:** Create browser-based monitoring dashboard for real-time agent monitoring with charts, metrics visualization, and alert configuration interface.
+- **Acceptance Criteria:**
+  - [ ] Express.js backend with REST API
+  - [ ] Vue.js frontend with responsive design
+  - [ ] Real-time metrics charts (success rate, token usage, execution time)
+  - [ ] Agent list with detailed status
+  - [ ] Log viewer with search and filtering
+  - [ ] Alert rules configuration UI
+  - [ ] Notification channel setup
+  - [ ] Authentication (optional)
+  - [ ] Docker support
+- **Dependencies:** REQ-011 (Agent Monitoring Dashboard), REQ-015 (Testing & CI/CD)
+- **Type:** UI/Enhancement
+- **Status:** BACKLOG 📋
+- **Estimated Effort:** High
+- **Target Date:** [Future]
+- **Related Memory:** Backlogged for later iteration
+
+#### REQ-014: Alert Configuration System (Phase 2 Enhancement)
+- **Description:** Implement comprehensive alert system for detecting and responding to agent failures, performance degradation, and resource constraints with multiple notification channels.
+- **Acceptance Criteria:**
+  - [x] AlertManager with configurable rules and condition evaluation
+  - [x] Alert deduplication (5-minute window)
+  - [x] Alert history with filtering and statistics
+  - [x] Pre-configured rules (agent failure, low success rate, slow execution, high token usage)
+  - [x] Email notifier with SMTP support
+  - [x] Slack notifier with formatted messages and color coding
+  - [x] GitHub notifier for auto-creating issues on critical alerts
+  - [x] CLI commands (alerts list, history, rules, stats, clear)
+  - [x] Safe condition evaluation (no eval injection risks)
+  - [x] Retry logic with exponential backoff
+  - [x] Comprehensive documentation (ALERTS.md)
+  - [x] 50+ unit tests (alerts + notifiers)
+  - [x] Production-ready error handling
+- **Dependencies:** REQ-011 (Agent Monitoring Dashboard), REQ-012 (Analysis System)
+- **Type:** Monitoring/Alerts
+- **Status:** DONE ✅
+- **Closed Date:** 2026-02-12
+- **GitHub Issue:** #20 (PR #23 merged)
+- **Estimated Effort:** High
+- **Target Date:** 2026-02-12 ✅ COMPLETE
+- **Implementation Notes:**
+  - AlertManager: 400+ lines, 85% code coverage
+  - Notifiers: Email, Slack, GitHub implementations
+  - Tests: 50 tests (24 AlertManager + 26 Notifiers)
+  - CLI: 100+ lines of alert management commands
+  - Documentation: 500+ lines with examples and troubleshooting
+  - 3,429 lines added across 16 files
+  - All tests passing (70/70 total with existing tests)
+  - Deduplication prevents alert storms
+  - Safe expression evaluation prevents injection attacks
+
 #### REQ-015: Comprehensive Testing & CI/CD Infrastructure
 - **Description:** Implement complete testing framework and automated CI/CD pipeline for the Agents Monitor project with comprehensive test coverage and production-ready quality gates.
 - **Acceptance Criteria:**
