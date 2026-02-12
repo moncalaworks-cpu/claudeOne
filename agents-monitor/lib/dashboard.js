@@ -188,6 +188,17 @@ class Dashboard {
 
     // Render the screen
     this.screen.render();
+
+    // Keep the process alive - prevent exit until user quits
+    // blessed keeps stdin open, but ensure we don't exit prematurely
+    if (!process.listeners('SIGINT').length) {
+      process.on('SIGINT', () => {
+        this.running = false;
+        clearInterval(this.refreshInterval);
+        this.screen.destroy();
+        process.exit(0);
+      });
+    }
   }
 
   /**
