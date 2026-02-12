@@ -39,7 +39,7 @@ jobs:
 
       - name: Run tests
         working-directory: agents-monitor
-        run: npx jest --coverage --watchAll=false --ci
+        run: npx jest tests/ --coverage --watchAll=false --ci
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
