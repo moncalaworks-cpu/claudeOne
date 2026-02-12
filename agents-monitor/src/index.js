@@ -16,6 +16,7 @@
 const { Command } = require('commander');
 const Dashboard = require('../lib/dashboard');
 const AgentMonitor = require('../lib/agents');
+const AlertManager = require('../lib/alerts');
 
 const program = new Command();
 
@@ -120,6 +121,138 @@ program
       }
     } catch (error) {
       console.error('❌ Error fetching metrics:', error.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('alerts')
+  .description('Manage alert system')
+  .action(() => {
+    console.log('\n⚠️  Alert Management Commands:\n');
+    console.log('  alerts list          Show recent alerts');
+    console.log('  alerts history       Show alert history with filters');
+    console.log('  alerts rules         Show configured alert rules');
+    console.log('  alerts stats         Show alert statistics');
+    console.log('  alerts clear         Clear alert history\n');
+  });
+
+program
+  .command('alerts list')
+  .description('Show recent alerts')
+  .option('--limit <number>', 'Limit results', 10)
+  .action((options) => {
+    try {
+      const alertManager = new AlertManager();
+      const alerts = alertManager.getHistory().slice(0, parseInt(options.limit));
+
+      if (alerts.length === 0) {
+        console.log('📭 No alerts recorded');
+        return;
+      }
+
+      console.log(`\n⚠️  Recent Alerts (last ${alerts.length}):\n`);
+      alerts.forEach((alert, index) => {
+        const date = new Date(alert.timestamp).toISOString();
+        console.log(`${index + 1}. [${alert.severity.toUpperCase()}] ${alert.name}`);
+        console.log(`   Agent: ${alert.agentName}`);
+        console.log(`   Time: ${date}`);
+        console.log(`   Message: ${alert.message}\n`);
+      });
+    } catch (error) {
+      console.error('❌ Error listing alerts:', error.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('alerts history')
+  .description('Show alert history with filters')
+  .option('--severity <level>', 'Filter by severity (critical|warning|info)')
+  .option('--agent <id>', 'Filter by agent ID')
+  .option('--limit <number>', 'Limit results', 20)
+  .action((options) => {
+    try {
+      const alertManager = new AlertManager();
+      const alerts = alertManager.getHistory({
+        severity: options.severity,
+        agentId: options.agent,
+      }).slice(0, parseInt(options.limit));
+
+      if (alerts.length === 0) {
+        console.log('📭 No alerts match the filter');
+        return;
+      }
+
+      console.log(`\n📋 Alert History (${alerts.length} results):\n`);
+      alerts.forEach((alert, index) => {
+        const date = new Date(alert.timestamp).toLocaleString();
+        console.log(`${index + 1}. [${alert.severity.toUpperCase()}] ${alert.name}`);
+        console.log(`   Agent: ${alert.agentName} (${alert.agentId})`);
+        console.log(`   Time: ${date}`);
+        console.log(`   Message: ${alert.message}\n`);
+      });
+    } catch (error) {
+      console.error('❌ Error fetching history:', error.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('alerts rules')
+  .description('Show configured alert rules')
+  .action(() => {
+    try {
+      const alertManager = new AlertManager();
+      const { rules } = alertManager.rules;
+
+      console.log('\n📋 Alert Rules:\n');
+      rules.forEach((rule, index) => {
+        const status = rule.enabled ? '✅' : '❌';
+        console.log(`${index + 1}. ${status} ${rule.name}`);
+        console.log(`   ID: ${rule.id}`);
+        console.log(`   Severity: ${rule.severity}`);
+        console.log(`   Condition: ${rule.condition}`);
+        console.log(`   Notify via: ${rule.notifyOn.join(', ')}\n`);
+      });
+    } catch (error) {
+      console.error('❌ Error fetching rules:', error.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('alerts stats')
+  .description('Show alert statistics')
+  .action(() => {
+    try {
+      const alertManager = new AlertManager();
+      const stats = alertManager.getStatistics();
+
+      console.log('\n📊 Alert Statistics:\n');
+      console.log(`Total Alerts: ${stats.totalAlerts}`);
+      console.log(`Alerts (Last 24h): ${stats.alertsLast24h}`);
+      console.log('\nBy Severity (Last 24h):');
+      console.log(`  Critical: ${stats.bySeverity.critical}`);
+      console.log(`  Warning: ${stats.bySeverity.warning}`);
+      console.log(`  Info: ${stats.bySeverity.info}`);
+      console.log('');
+    } catch (error) {
+      console.error('❌ Error fetching statistics:', error.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('alerts clear')
+  .description('Clear alert history')
+  .action(() => {
+    try {
+      const alertManager = new AlertManager();
+      alertManager.clearHistory();
+      console.log('✅ Alert history cleared');
+    } catch (error) {
+      console.error('❌ Error clearing history:', error.message);
       process.exit(1);
     }
   });
