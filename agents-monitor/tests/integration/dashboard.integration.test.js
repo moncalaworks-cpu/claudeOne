@@ -86,58 +86,53 @@ describe('Dashboard Integration', () => {
         TERM: 'xterm',
         NODE_ENV: 'test'
       },
-      stdio: ['pipe', 'pipe', 'pipe'],
-      timeout: 10000
+      stdio: ['pipe', 'pipe', 'pipe']
     });
 
-    let startTime;
-    let processAlive = false;
-    let allOutput = '';
-
-    dashboardProcess.stdout.on('data', (data) => {
-      allOutput += data.toString();
-    });
+    let dashboardStarted = false;
+    let processExited = false;
 
     dashboardProcess.stderr.on('data', (data) => {
-      allOutput += data.toString();
-
-      // Check if dashboard started (message is on stderr now)
-      // Check accumulated output, not just current chunk
-      if (!processAlive && allOutput.includes('✅ Dashboard started')) {
-        startTime = Date.now();
-        processAlive = true;
+      if (data.toString().includes('✅ Dashboard started')) {
+        dashboardStarted = true;
       }
     });
 
-    // Check that process stays alive for at least 2 seconds
-    setTimeout(() => {
-      if (processAlive && !dashboardProcess.killed) {
-        const elapsed = Date.now() - startTime;
-        expect(elapsed).toBeGreaterThan(1500);
-        expect(dashboardProcess.exitCode).toBeNull(); // Process still running
+    dashboardProcess.on('exit', () => {
+      processExited = true;
+    });
+
+    // Wait 3 seconds after startup is detected
+    let checkTimeout;
+    const dataListener = () => {
+      if (dashboardStarted && !checkTimeout) {
+        checkTimeout = setTimeout(() => {
+          // After 2 more seconds, verify process is still running
+          if (!processExited && dashboardProcess.exitCode === null) {
+            expect(true).toBe(true); // Process is still running
+            dashboardProcess.kill('SIGTERM');
+            done();
+          }
+        }, 2000);
+      }
+    };
+
+    dashboardProcess.stderr.on('data', dataListener);
+
+    // Timeout if process doesn't start or exits unexpectedly
+    const mainTimeout = setTimeout(() => {
+      if (!dashboardStarted) {
         dashboardProcess.kill('SIGTERM');
-        done();
-      }
-    }, 2500);
-
-    dashboardProcess.on('error', (error) => {
-      done(new Error(`Dashboard process error: ${error.message}`));
-    });
-
-    dashboardProcess.on('exit', (code) => {
-      if (!processAlive) {
-        console.log('DEBUG: Dashboard exited with code:', code);
-        console.log('DEBUG: All output collected:', allOutput.substring(0, 1000));
-      }
-    });
-
-    // Timeout
-    setTimeout(() => {
-      if (!processAlive) {
-        dashboardProcess.kill('SIGTERM');
-        done(new Error(`Dashboard did not stay alive. Output: ${allOutput.substring(0, 500)}`));
+        done(new Error('Dashboard did not start'));
+      } else if (processExited) {
+        done(new Error('Dashboard exited prematurely'));
       }
     }, 5000);
+
+    dashboardProcess.on('exit', () => {
+      clearTimeout(checkTimeout);
+      clearTimeout(mainTimeout);
+    });
   }, 10000);
 
   it('should not crash on startup', (done) => {
