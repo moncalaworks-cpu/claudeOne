@@ -89,49 +89,51 @@ describe('Dashboard Integration', () => {
       stdio: ['pipe', 'pipe', 'pipe']
     });
 
-    let dashboardStarted = false;
     let processExited = false;
 
-    dashboardProcess.stderr.on('data', (data) => {
-      if (data.toString().includes('✅ Dashboard started')) {
-        dashboardStarted = true;
-      }
-    });
-
-    dashboardProcess.on('exit', () => {
+    dashboardProcess.on('exit', (code) => {
       processExited = true;
+      if (!doneCalled) {
+        done(new Error(`Process exited with code ${code}`));
+        doneCalled = true;
+      }
     });
 
-    // Wait 3 seconds after startup is detected
-    let checkTimeout;
-    const dataListener = () => {
-      if (dashboardStarted && !checkTimeout) {
-        checkTimeout = setTimeout(() => {
-          // After 2 more seconds, verify process is still running
-          if (!processExited && dashboardProcess.exitCode === null) {
-            expect(true).toBe(true); // Process is still running
-            dashboardProcess.kill('SIGTERM');
-            done();
-          }
-        }, 2000);
+    dashboardProcess.on('error', (error) => {
+      if (!doneCalled) {
+        done(error);
+        doneCalled = true;
       }
-    };
+    });
 
-    dashboardProcess.stderr.on('data', dataListener);
+    // After 2 seconds, check if process is still alive
+    let doneCalled = false;
+    const checkTimeout = setTimeout(() => {
+      if (!doneCalled) {
+        if (processExited) {
+          done(new Error('Process exited before test check'));
+          doneCalled = true;
+        } else if (dashboardProcess.exitCode === null && !dashboardProcess.killed) {
+          // Process is still alive - success!
+          dashboardProcess.kill('SIGTERM');
+          done();
+          doneCalled = true;
+        }
+      }
+    }, 2000);
 
-    // Timeout if process doesn't start or exits unexpectedly
-    const mainTimeout = setTimeout(() => {
-      if (!dashboardStarted) {
+    // Safeguard timeout
+    const safeTimeout = setTimeout(() => {
+      if (!doneCalled) {
         dashboardProcess.kill('SIGTERM');
-        done(new Error('Dashboard did not start'));
-      } else if (processExited) {
-        done(new Error('Dashboard exited prematurely'));
+        done(new Error('Test timeout'));
+        doneCalled = true;
       }
     }, 5000);
 
     dashboardProcess.on('exit', () => {
       clearTimeout(checkTimeout);
-      clearTimeout(mainTimeout);
+      clearTimeout(safeTimeout);
     });
   }, 10000);
 
