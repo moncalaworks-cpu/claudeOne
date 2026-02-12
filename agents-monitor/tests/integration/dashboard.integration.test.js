@@ -148,21 +148,31 @@ describe('Dashboard Integration', () => {
         TERM: 'xterm',
         NODE_ENV: 'test'
       },
+      stdio: ['pipe', 'pipe', 'pipe'],
       timeout: 10000
     });
 
     let crashed = false;
     let errorMessages = [];
+    let dashboardStarted = false;
 
     dashboardProcess.stderr.on('data', (data) => {
       const error = data.toString();
       errorMessages.push(error);
 
-      // Check for crash indicators
+      // Track successful startup
+      if (error.includes('✅ Dashboard started')) {
+        dashboardStarted = true;
+      }
+
+      // Check for crash indicators - especially blessed rendering errors
       if (
         error.includes('Error starting dashboard') ||
         error.includes('TypeError') ||
-        error.includes('ReferenceError')
+        error.includes('ReferenceError') ||
+        error.includes('String.prototype.bold') ||
+        error.includes('Error on xterm') ||
+        error.includes('at bold')
       ) {
         crashed = true;
       }
@@ -175,16 +185,16 @@ describe('Dashboard Integration', () => {
       }
     });
 
-    // Let it run for 3 seconds
+    // Let it run for 4 seconds to allow rendering and catch any rendering errors
     setTimeout(() => {
+      expect(dashboardStarted).toBe(true);
       expect(crashed).toBe(false);
-      if (errorMessages.length > 0) {
-        // Log errors but don't fail on non-critical errors
+      if (errorMessages.some(msg => msg.includes('Error') || msg.includes('TypeError'))) {
         console.log('Dashboard stderr:', errorMessages.join(''));
       }
       dashboardProcess.kill('SIGTERM');
       done();
-    }, 3000);
+    }, 4000);
   }, 10000);
 
   it('should respond to keyboard interrupt (Ctrl+C)', (done) => {

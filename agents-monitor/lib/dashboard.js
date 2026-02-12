@@ -103,6 +103,7 @@ class Dashboard {
       height: '25%-2',
       label: ' Metrics ',
       border: 'line',
+      content: 'Waiting for metrics...',
       style: {
         border: 'green'
       }
@@ -117,6 +118,7 @@ class Dashboard {
       height: '22%-2',
       label: ' Performance ',
       border: 'line',
+      content: 'Waiting for performance data...',
       style: {
         border: 'yellow'
       }
@@ -300,7 +302,7 @@ class Dashboard {
   updateMetrics(metrics) {
     const content = `
  Total: ${metrics.totalAgents} | Active: ${metrics.activeAgents} | Failed: ${metrics.failedAgents}
- Success Rate: {green}${metrics.successRate}%{/green}
+ Success Rate: ${metrics.successRate}%
  Avg Time: ${metrics.avgExecutionTime}ms
  Total Tokens: ${metrics.totalTokensUsed}
     `.trim();
@@ -329,7 +331,8 @@ class Dashboard {
     const barLength = 20;
     const filled = Math.round((percentage / 100) * barLength);
     const empty = barLength - filled;
-    return `[${'{green}' + '█'.repeat(filled) + '{/green}' + '░'.repeat(empty)}] ${percentage.toFixed(0)}%`;
+    // No markup tags - blessed can't parse them properly in this context
+    return `[${'█'.repeat(filled)}${'░'.repeat(empty)}] ${percentage.toFixed(0)}%`;
   }
 
   /**
