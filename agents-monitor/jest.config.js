@@ -1,3 +1,7 @@
+// Debug: Log Jest environment
+console.log('[Jest Config] CI environment:', process.env.CI);
+console.log('[Jest Config] GITHUB_ACTIONS environment:', process.env.GITHUB_ACTIONS);
+
 module.exports = {
   testEnvironment: 'node',
   coverageDirectory: 'coverage',
