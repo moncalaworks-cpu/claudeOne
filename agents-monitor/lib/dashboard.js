@@ -53,10 +53,12 @@ class Dashboard {
       left: 0,
       width: '100%',
       height: 3,
-      content: '{center}{bold}{cyan}Claude Code Agents Monitor{/cyan}{/bold}{/center}',
+      content: 'Claude Code Agents Monitor',
+      contentAlignment: 'center',
       style: {
         bg: 'blue',
-        fg: 'white'
+        fg: 'white',
+        bold: true
       }
     });
 
