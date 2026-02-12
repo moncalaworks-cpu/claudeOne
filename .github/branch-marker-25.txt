@@ -1,0 +1,1 @@
+Issue #25 - REQ-011.2: Fix dashboard terminal compatibility issues
