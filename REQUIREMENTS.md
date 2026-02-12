@@ -411,6 +411,22 @@ Enhancements and advanced monitoring for production deployments.
   - Dashboard now stays running indefinitely until killed by user or signal
 - **Verification:** ✅ Dashboard displays and stays open in iTerm2, responds to Ctrl+C, all 5 tests pass
 
+#### REQ-011.6: Switch dashboard to text-mode for terminal compatibility (Final Fix)
+- **Description:** Dashboard UI was not displaying in iTerm2 despite blessed library generating escape codes correctly. Blessed had terminal compatibility issues in the user's environment.
+- **Status:** DONE ✅
+- **GitHub Issue:** None (final implementation)
+- **Root Causes Identified:**
+  1. Blessed's terminal detection unreliable (isTTY undefined vs true/false)
+  2. Alternate screen buffer compatibility issues across different terminals
+  3. Blessed rendering not visible even when escape codes generated correctly
+- **Final Solution:**
+  - Removed blessed dependency entirely
+  - Implemented reliable text-mode dashboard with formatted metrics
+  - Shows: Active Agents | Success Rate | Avg Time | Total Tokens
+  - Updates every second with timestamp
+  - Works on all terminals (iTerm2, Terminal.app, etc)
+- **Verification:** ✅ Dashboard displays cleanly, Ctrl+C works, metrics update every second, all 5 tests pass, user confirmed "Success!"
+
 #### REQ-014.1: Fix alert CLI commands routing (Bug Fix)
 - **Description:** Fix alert CLI commands (list, rules, stats, history) which were not routing correctly due to conflicting command definitions in Commander.js.
 - **Status:** DONE ✅
