@@ -266,6 +266,38 @@ Enhancements and advanced monitoring for production deployments.
   - Clear reasoning provided in analysis comments
   - Tested and working with REQ-011 and REQ-012 issues
 
+#### REQ-015: Comprehensive Testing & CI/CD Infrastructure
+- **Description:** Implement complete testing framework and automated CI/CD pipeline for the Agents Monitor project with comprehensive test coverage and production-ready quality gates.
+- **Acceptance Criteria:**
+  - [x] Jest testing framework configured with coverage thresholds (80% lines, 70% functions/branches)
+  - [x] Global test setup and environment initialization
+  - [x] Unit tests for AgentMonitor class (registerAgent, getActiveAgents, getAgentLogs, startMonitoring, stopMonitoring, updateHeartbeat)
+  - [x] Unit tests for MetricsCollector class (getMetrics, getHealthStatus, clearCache, getMetricsByTimeRange)
+  - [x] 45+ test cases covering happy path and error scenarios
+  - [x] GitHub Actions CI/CD workflow (test-and-coverage.yml)
+  - [x] Multi-version Node.js testing (16.x, 18.x)
+  - [x] Automated coverage reporting to Codecov
+  - [x] Security scanning (npm audit, OWASP Dependency Check)
+  - [x] Auto-commenting on PRs with test results
+  - [x] Pre-commit hook structure (Husky-ready)
+  - [x] Comprehensive TESTING.md documentation (250+ lines)
+  - [x] Workflow rules updated to enforce testing on all code work
+  - [x] test, test:watch, test:coverage, test:ci scripts in package.json
+- **Dependencies:** REQ-011 (Agent Monitoring Dashboard)
+- **Type:** Quality/Infrastructure
+- **Status:** DONE ✅
+- **Closed Date:** 2026-02-12
+- **GitHub Issue:** #21 (PR #22 merged)
+- **Estimated Effort:** Medium
+- **Target Date:** 2026-02-12 ✅ COMPLETE
+- **Implementation Notes:**
+  - Jest configuration with coverage thresholds: 80% lines, 70% functions/branches
+  - Test files: agents.test.js (25+ cases), metrics.test.js (20+ cases)
+  - CI/CD handles: linting, testing, coverage, security scanning, PR comments
+  - Documentation includes examples, troubleshooting, best practices
+  - Workflow rules now require tests for all code work (Rule 2)
+  - 653 lines added (6 files: jest.config.js, tests/setup.js, agents.test.js, metrics.test.js, test-and-coverage.yml, TESTING.md)
+
 ---
 
 ## Dependencies & Constraints
