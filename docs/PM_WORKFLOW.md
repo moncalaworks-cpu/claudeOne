@@ -354,6 +354,43 @@ See REQUIREMENTS.md#REQ-XXX
 
 ---
 
+## Real Example: REQ-001 Completion
+
+**This is a real example of completing a requirement using this workflow:**
+
+### The Requirement
+```
+REQ-001: Comprehensive Agentic Workflows Guide
+Status: IN_PROGRESS
+GitHub Issue: #1
+```
+
+### The Workflow Steps Executed
+1. ✅ Issue #1 created and labeled (phase-1-mvp, priority-high, status-ready)
+2. ✅ Issue moved to IN_PROGRESS column on board
+3. ✅ Assigned to self
+4. ✅ Created feature branch: `REQ-001-workflows-guide`
+5. ✅ Made updates to documentation
+6. ✅ Committed changes: "Work on REQ-001: Update agentic workflows guide"
+7. ✅ Pushed to GitHub
+8. ✅ Created PR with "Closes #1" to auto-close issue
+9. ✅ Merged PR (issue auto-closed)
+10. ✅ Updated REQUIREMENTS.md with DONE status
+
+### Result
+- Issue #1 closed automatically when PR merged
+- Board moved issue to DONE column
+- REQUIREMENTS.md updated with completion date
+- Workflow demonstrated end-to-end
+
+### Key Lessons Learned
+- **Branch naming** helps track which requirement was worked on
+- **"Closes #1" in PR** auto-closes the issue when merged
+- **Labels kept current** throughout the workflow
+- **REQUIREMENTS.md** serves as permanent record of what was done
+
+---
+
 ## Related Documents
 
 - [REQUIREMENTS.md](../REQUIREMENTS.md) - Source of truth for what needs to be built
