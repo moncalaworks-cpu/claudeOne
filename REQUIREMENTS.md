@@ -57,15 +57,17 @@ Core features needed for initial launch. These block the project from being usab
 #### REQ-002: CRAFT Prompt Engineering Framework
 - **Description:** Document the CRAFT (Context, Role, Action, Format, Tone) framework for structuring effective prompts to Claude for agentic tasks.
 - **Acceptance Criteria:**
-  - [ ] Framework definition and rationale documented
-  - [ ] Each component (C, R, A, F, T) explained with examples
-  - [ ] Common mistakes and best practices listed
-  - [ ] Template provided for users to copy and adapt
-  - [ ] Real-world examples from agent use cases
+  - [x] Framework definition and rationale documented
+  - [x] Each component (C, R, A, F, T) explained with examples
+  - [x] Common mistakes and best practices listed
+  - [x] Template provided for users to copy and adapt
+  - [x] Real-world examples from agent use cases
 - **Dependencies:** None
 - **Constraints:** Must work for both simple and complex prompts
-- **Implementation Notes:** See existing guide: `Claude_Code_Agentic_Workflows_Guide.md` (Part 1)
-- **Status:** IN_PROGRESS
+- **Implementation Notes:** See new guide: `my-agentic-code-project/docs/CRAFT_FRAMEWORK_GUIDE.md`
+- **Status:** DONE ✅
+- **Closed Date:** 2026-02-12
+- **GitHub Issue:** #2 (PR #12 merged)
 - **Related Memory:** See `patterns.md` for prompt patterns discovered
 - **Estimated Effort:** Medium
 - **Target Date:** 2026-02-28
