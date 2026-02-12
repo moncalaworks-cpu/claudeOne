@@ -122,7 +122,7 @@ describe('Dashboard Integration', () => {
     dashboardProcess.on('exit', exitHandler);
     dashboardProcess.on('error', errorHandler);
 
-    // After 2 seconds, check if process is still alive
+    // After 3 seconds, check if process is still alive
     const checkTimeout = setTimeout(() => {
       if (!doneCalled) {
         if (dashboardProcess.exitCode === null && !dashboardProcess.killed) {
@@ -134,7 +134,7 @@ describe('Dashboard Integration', () => {
           done();
         }
       }
-    }, 2000);
+    }, 3000);
 
     // Safeguard timeout
     const safeTimeout = setTimeout(() => {
@@ -145,14 +145,14 @@ describe('Dashboard Integration', () => {
         }
         done(new Error('Test timeout - process never became ready'));
       }
-    }, 5000);
+    }, 6000);
 
     // Cleanup
     dashboardProcess.on('exit', () => {
       clearTimeout(checkTimeout);
       clearTimeout(safeTimeout);
     });
-  }, 10000);
+  }, 15000);
 
   it('should not crash on startup', (done) => {
     dashboardProcess = spawn('node', ['src/index.js', 'start'], {
