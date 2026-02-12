@@ -31,7 +31,7 @@ program
   .option('--refresh <ms>', 'Refresh interval in milliseconds', 1000)
   .action(async (options) => {
     try {
-      process.stderr.write('🚀 Starting Agents Monitoring Dashboard...\n');
+      process.stderr.write('🚀 Starting Agents Monitoring Dashboard\n');
       const dashboard = new Dashboard(options);
       await dashboard.init();
       await dashboard.start();

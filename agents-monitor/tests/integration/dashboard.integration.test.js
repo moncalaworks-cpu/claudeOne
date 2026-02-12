@@ -17,7 +17,7 @@ describe('Dashboard Integration', () => {
   });
 
   it('should start dashboard without errors', (done) => {
-    dashboardProcess = spawn('npm', ['start'], {
+    dashboardProcess = spawn('node', ['src/index.js', 'start'], {
       cwd: path.join(__dirname, '../../'),
       env: {
         ...process.env,
@@ -79,7 +79,7 @@ describe('Dashboard Integration', () => {
   }, 10000);
 
   it('should keep dashboard running (not exit immediately)', (done) => {
-    dashboardProcess = spawn('npm', ['start'], {
+    dashboardProcess = spawn('node', ['src/index.js', 'start'], {
       cwd: path.join(__dirname, '../../'),
       env: {
         ...process.env,
@@ -99,11 +99,11 @@ describe('Dashboard Integration', () => {
     });
 
     dashboardProcess.stderr.on('data', (data) => {
-      const chunk = data.toString();
-      allOutput += chunk;
+      allOutput += data.toString();
 
       // Check if dashboard started (message is on stderr now)
-      if (chunk.includes('✅ Dashboard started')) {
+      // Check accumulated output, not just current chunk
+      if (!processAlive && allOutput.includes('✅ Dashboard started')) {
         startTime = Date.now();
         processAlive = true;
       }
@@ -141,7 +141,7 @@ describe('Dashboard Integration', () => {
   }, 10000);
 
   it('should not crash on startup', (done) => {
-    dashboardProcess = spawn('npm', ['start'], {
+    dashboardProcess = spawn('node', ['src/index.js', 'start'], {
       cwd: path.join(__dirname, '../../'),
       env: {
         ...process.env,
@@ -198,7 +198,7 @@ describe('Dashboard Integration', () => {
   }, 10000);
 
   it('should respond to keyboard interrupt (Ctrl+C)', (done) => {
-    dashboardProcess = spawn('npm', ['start'], {
+    dashboardProcess = spawn('node', ['src/index.js', 'start'], {
       cwd: path.join(__dirname, '../../'),
       env: {
         ...process.env,
@@ -244,7 +244,7 @@ describe('Dashboard Integration', () => {
   }, 10000);
 
   it('should have required UI elements in output', (done) => {
-    dashboardProcess = spawn('npm', ['start'], {
+    dashboardProcess = spawn('node', ['src/index.js', 'start'], {
       cwd: path.join(__dirname, '../../'),
       env: {
         ...process.env,

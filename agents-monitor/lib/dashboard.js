@@ -18,6 +18,8 @@ class Dashboard {
     this.metrics = new MetricsCollector();
     this.screen = null;
     this.running = false;
+    this.keepAliveInterval = null;
+    this.refreshInterval = null;
   }
 
   /**
@@ -220,34 +222,46 @@ class Dashboard {
       // stdin.resume() keeps the event loop active for keyboard input
       process.stdin.resume();
 
+      // Define cleanup function
+      const cleanup = () => {
+        this.running = false;
+
+        // Clear intervals
+        if (this.refreshInterval) {
+          clearInterval(this.refreshInterval);
+          this.refreshInterval = null;
+        }
+        if (this.keepAliveInterval) {
+          clearInterval(this.keepAliveInterval);
+          this.keepAliveInterval = null;
+        }
+
+        // Destroy blessed screen if it exists
+        if (this.screen) {
+          try {
+            this.screen.destroy();
+          } catch (e) {
+            // Ignore errors during destroy
+          }
+        }
+
+        process.exit(0);
+      };
+
       // Handle exit signals gracefully
       if (!process.listeners('SIGINT').length) {
-        process.on('SIGINT', () => {
-          this.running = false;
-          clearInterval(this.refreshInterval);
-          if (this.screen) {
-            this.screen.destroy();
-          }
-          process.exit(0);
-        });
+        process.on('SIGINT', cleanup);
       }
 
       // Also handle SIGTERM
       if (!process.listeners('SIGTERM').length) {
-        process.on('SIGTERM', () => {
-          this.running = false;
-          clearInterval(this.refreshInterval);
-          if (this.screen) {
-            this.screen.destroy();
-          }
-          process.exit(0);
-        });
+        process.on('SIGTERM', cleanup);
       }
 
       // Set up dummy interval to keep event loop active
       // This prevents Node.js from exiting even if there are no other active handles
-      // eslint-disable-next-line no-unused-vars
-      const keepAliveInterval = setInterval(() => {
+      // In test mode, signal handlers will clean this up properly
+      this.keepAliveInterval = setInterval(() => {
         // Dummy operation - just to keep the event loop running
       }, 1000);
 
@@ -255,7 +269,7 @@ class Dashboard {
       // This ensures the process stays alive and doesn't exit after start() completes
       return new Promise(() => {
         // Never resolve - dashboard runs until process is killed
-        // Keep-alive interval ensures event loop stays active
+        // Keep-alive interval (if active) ensures event loop stays active
       });
     } catch (error) {
       console.error('❌ Error starting dashboard:', error.message);
