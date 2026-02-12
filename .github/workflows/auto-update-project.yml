@@ -1,0 +1,42 @@
+name: Auto-Update Project Board
+
+on:
+  pull_request:
+    types: [opened, closed]
+
+jobs:
+  update-project:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Update issue status based on PR
+        run: |
+          PR_NUM="${{ github.event.pull_request.number }}"
+          PR_STATE="${{ github.event.pull_request.state }}"
+          PR_BODY="${{ github.event.pull_request.body }}"
+
+          # Extract issue number from PR body (e.g., "Closes #1")
+          if [[ "$PR_BODY" =~ Closes[[:space:]]+#([0-9]+) ]]; then
+            ISSUE_NUM="${BASH_REMATCH[1]}"
+
+            if [ "${{ github.event.action }}" == "opened" ]; then
+              # PR opened: mark as in-progress
+              gh issue edit "$ISSUE_NUM" \
+                --remove-label "status-ready" \
+                --add-label "status-in-progress" || true
+              echo "Updated issue #$ISSUE_NUM: PR #$PR_NUM opened (status-in-progress)"
+            fi
+
+            if [ "${{ github.event.action }}" == "closed" ] && [ "${{ github.event.pull_request.merged }}" == "true" ]; then
+              # PR merged: mark as done (issue will auto-close)
+              gh issue edit "$ISSUE_NUM" \
+                --remove-label "status-in-progress" \
+                --add-label "status-in-review" || true
+              echo "Updated issue #$ISSUE_NUM: PR #$PR_NUM merged (status-in-review)"
+            fi
+          else
+            echo "No issue reference found in PR body"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

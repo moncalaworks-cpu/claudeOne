@@ -1,0 +1,39 @@
+name: Auto-Label Requirements
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  label-requirement:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Extract REQ number and add labels
+        run: |
+          TITLE="${{ github.event.issue.title }}"
+          ISSUE_NUM="${{ github.event.issue.number }}"
+
+          # Check if title contains REQ-XXX pattern
+          if [[ "$TITLE" =~ REQ-00[1-4] ]]; then
+            # Phase 1: MVP (REQ-001 to REQ-004)
+            gh issue edit $ISSUE_NUM --add-label "phase-1-mvp" --add-label "type-feature" --add-label "status-ready"
+            echo "Added Phase 1 labels"
+          elif [[ "$TITLE" =~ REQ-00[5-7] ]]; then
+            # Phase 2: Important (REQ-005 to REQ-007)
+            gh issue edit $ISSUE_NUM --add-label "phase-2-important" --add-label "type-feature" --add-label "status-ready"
+            echo "Added Phase 2 labels"
+          elif [[ "$TITLE" =~ REQ-00[8-9] ]] || [[ "$TITLE" =~ REQ-010 ]]; then
+            # Phase 3: Nice to Have (REQ-008 to REQ-010)
+            gh issue edit $ISSUE_NUM --add-label "phase-3-nice-to-have" --add-label "type-feature" --add-label "status-ready"
+            echo "Added Phase 3 labels"
+          fi
+
+          # Add type-documentation if title mentions docs/guide/documentation
+          if [[ "$TITLE" =~ [Dd]oc|[Gg]uide|[Rr]unbook ]]; then
+            gh issue edit $ISSUE_NUM --add-label "type-documentation"
+            echo "Added documentation label"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,48 @@
+name: Auto-Create Branch
+
+on:
+  issues:
+    types: [assigned]
+
+jobs:
+  create-branch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract REQ code and create branch
+        run: |
+          TITLE="${{ github.event.issue.title }}"
+          ISSUE_NUM="${{ github.event.issue.number }}"
+
+          # Extract REQ-XXX from title
+          if [[ "$TITLE" =~ (REQ-[0-9]+) ]]; then
+            REQ_CODE="${BASH_REMATCH[1]}"
+            # Convert title to slug format
+            SLUG=$(echo "$TITLE" | sed 's/\[REQ-[0-9]*\] //' | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g' | cut -c 1-50)
+            BRANCH_NAME="${REQ_CODE,,}-${SLUG}"
+
+            # Create and push branch from main
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git checkout main
+            git pull origin main
+            git checkout -b "$BRANCH_NAME"
+
+            # Add a marker file to show branch was created
+            echo "Issue #$ISSUE_NUM - $TITLE" > ".github/branch-marker-$ISSUE_NUM.txt"
+            git add ".github/branch-marker-$ISSUE_NUM.txt"
+            git commit -m "Create branch for issue #$ISSUE_NUM ($REQ_CODE)"
+            git push origin "$BRANCH_NAME"
+
+            echo "Created branch: $BRANCH_NAME"
+          else
+            echo "No REQ code found in title"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
