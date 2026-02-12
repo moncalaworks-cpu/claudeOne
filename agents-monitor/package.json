@@ -7,8 +7,8 @@
     "agents-monitor": "src/index.js"
   },
   "scripts": {
-    "start": "node src/index.js start",
-    "dev": "node src/index.js start --dev",
+    "start": "TERM=xterm node src/index.js start",
+    "dev": "TERM=xterm node src/index.js start --dev",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
