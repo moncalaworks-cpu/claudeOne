@@ -12,6 +12,7 @@ jobs:
     steps:
       - name: Assign issue to sender
         run: |
-          gh issue edit ${{ github.event.issue.number }} --add-assignee @me
+          gh issue edit ${{ github.event.issue.number }} \
+            --add-assignee ${{ github.event.issue.user.login }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
