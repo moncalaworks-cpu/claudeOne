@@ -24,11 +24,13 @@ class Dashboard {
    * Initialize the dashboard
    */
   async init() {
-    // Create the blessed screen
+    // Create the blessed screen with terminal compatibility fixes
     this.screen = blessed.screen({
       smartCSR: true,
-      mouse: true,
-      title: 'Claude Code Agents Monitor'
+      mouse: false, // Disable mouse to avoid terminal issues
+      title: 'Claude Code Agents Monitor',
+      useStyle: true,
+      dockBorders: true,
     });
 
     // Create main layout
