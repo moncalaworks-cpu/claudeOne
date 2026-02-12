@@ -31,12 +31,13 @@ program
   .option('--refresh <ms>', 'Refresh interval in milliseconds', 1000)
   .action(async (options) => {
     try {
-      console.log('🚀 Starting Agents Monitoring Dashboard...');
+      // Write to stderr to ensure message appears immediately and isn't buffered
+      process.stderr.write('🚀 Starting Agents Monitoring Dashboard...\n');
       const dashboard = new Dashboard(options);
       await dashboard.init();
       await dashboard.start();
     } catch (error) {
-      console.error('❌ Error starting dashboard:', error.message);
+      process.stderr.write(`❌ Error starting dashboard: ${error.message}\n`);
       process.exit(1);
     }
   });

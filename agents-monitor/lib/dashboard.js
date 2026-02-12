@@ -26,13 +26,22 @@ class Dashboard {
   async init() {
     try {
       // Create the blessed screen with terminal compatibility fixes
-      this.screen = blessed.screen({
+      const screenOptions = {
         smartCSR: true,
         mouse: false, // Disable mouse to avoid terminal issues
         title: 'Claude Code Agents Monitor',
         useStyle: true,
         dockBorders: true,
-      });
+        output: process.stdout, // Explicitly use stdout
+        input: process.stdin    // Explicitly use stdin
+      };
+
+      // In test environment, disable alternate screen to allow output capture
+      if (process.env.NODE_ENV === 'test') {
+        screenOptions.altScreen = false;
+      }
+
+      this.screen = blessed.screen(screenOptions);
 
       // Create main layout
       this.createLayout();
@@ -40,7 +49,8 @@ class Dashboard {
       // Handle keyboard shortcuts
       this.setupKeyboardHandlers();
 
-      console.log('✅ Dashboard initialized');
+      // Write to stderr to ensure message appears immediately and isn't buffered
+      process.stderr.write('✅ Dashboard initialized\n');
     } catch (error) {
       console.error('❌ Error during initialization:', error.message);
       throw error;
@@ -180,7 +190,8 @@ class Dashboard {
   async start() {
     try {
       this.running = true;
-      console.log('✅ Dashboard started. Press q to quit.');
+      // Write to stderr to ensure message appears immediately and isn't buffered
+      process.stderr.write('✅ Dashboard started\n');
 
       // Initial update
       await this.updateDashboard();
@@ -222,6 +233,12 @@ class Dashboard {
           process.exit(0);
         });
       }
+
+      // Return a promise that never resolves - keeps the dashboard running indefinitely
+      // This ensures the process stays alive and doesn't exit after start() completes
+      return new Promise(() => {
+        // Never resolve - dashboard runs until process is killed
+      });
     } catch (error) {
       console.error('❌ Error starting dashboard:', error.message);
       console.error(error.stack);
