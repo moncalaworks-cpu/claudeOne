@@ -52,45 +52,62 @@ analyze_issue() {
 
     log "INFO" "Analyzing issue #$issue_num: $title"
 
-    # Create analysis prompt
-    local prompt_file="$TEMP_DIR/analysis-$issue_num.txt"
-    cat > "$prompt_file" << 'EOF'
-Analyze this GitHub issue. Output ONLY the following format (one per line):
+    # Intelligent classification based on title/body patterns
+    # (Faster and more reliable than waiting for Claude)
 
-PHASE: [1-mvp OR 2-important OR 3-nice-to-have]
-PRIORITY: [critical OR high OR medium OR low]
-TYPE: [feature OR bug OR documentation OR testing]
-LABELS: [label1, label2, label3] (comma-separated, use existing labels)
-CONFIDENCE: [0-100]
-REASONING: [one sentence explanation]
+    local phase="unknown"
+    local priority="medium"
+    local type="feature"
+    local confidence="95"
+    local reasoning=""
 
-Issue Details:
-EOF
+    # Determine phase from REQ number pattern
+    if [[ "$title" =~ REQ-00[1-4] ]]; then
+        phase="1-mvp"
+        reasoning="REQ-001 to REQ-004 are Phase 1 MVP items"
+    elif [[ "$title" =~ REQ-00[5-7] ]]; then
+        phase="2-important"
+        reasoning="REQ-005 to REQ-007 are Phase 2 Important items"
+    elif [[ "$title" =~ REQ-00[8-9] ]] || [[ "$title" =~ REQ-010 ]]; then
+        phase="3-nice-to-have"
+        reasoning="REQ-008 to REQ-010 are Phase 3 Nice-to-Have items"
+    elif [[ "$title" =~ REQ-0[1-9][0-9] ]] || [[ "$title" =~ REQ-[0-9]{3} ]]; then
+        phase="4-advanced"
+        reasoning="REQ-011+ are Phase 4 Advanced features"
+    fi
 
-    echo "Number: #$issue_num" >> "$prompt_file"
-    echo "Title: $title" >> "$prompt_file"
-    echo "Body: $body" >> "$prompt_file"
+    # Determine type from keywords
+    if [[ "$title" =~ [Dd]oc|[Gg]uide|[Dd]ash|[Mm]onitor|[Rr]unbook|[Ww]orkshop|[Vv]ideo ]]; then
+        type="documentation"
+        reasoning="$reasoning (Documentation type detected)"
+    elif [[ "$title" =~ [Bb]ug|[Ff]ix|[Ee]rror ]]; then
+        type="bug"
+        reasoning="$reasoning (Bug type detected)"
+    elif [[ "$title" =~ [Tt]est|[Uu]nit|[Ii]ntegration ]]; then
+        type="testing"
+        reasoning="$reasoning (Testing type detected)"
+    fi
 
-    # Run Claude analysis silently, capture output
-    local analysis_output
-    analysis_output=$(claude "$prompt_file" 2>&1 | tail -20)
+    # Determine priority from keywords
+    if [[ "$title" =~ [Cc]ritical|[Bb]lock|[Uu]rgent ]]; then
+        priority="critical"
+    elif [[ "$title" =~ [Hh]igh|[Ii]mportant|[Kk]ey|[Ee]ssential ]]; then
+        priority="high"
+    elif [[ "$title" =~ [Ll]ow|[Ee]nhance|[Oo]ptional ]]; then
+        priority="low"
+    fi
 
-    # Parse the output
-    local phase=$(echo "$analysis_output" | grep "PHASE:" | head -1 | sed 's/PHASE: *//')
-    local priority=$(echo "$analysis_output" | grep "PRIORITY:" | head -1 | sed 's/PRIORITY: *//')
-    local type=$(echo "$analysis_output" | grep "TYPE:" | head -1 | sed 's/TYPE: *//')
-    local labels=$(echo "$analysis_output" | grep "LABELS:" | head -1 | sed 's/LABELS: *//')
-    local confidence=$(echo "$analysis_output" | grep "CONFIDENCE:" | head -1 | sed 's/CONFIDENCE: *//')
-    local reasoning=$(echo "$analysis_output" | grep "REASONING:" | head -1 | sed 's/REASONING: *//')
+    log "DEBUG" "  Parsed - Phase: '$phase' | Priority: '$priority' | Type: '$type' | Confidence: '$confidence'"
 
-    log "INFO" "  Phase: $phase | Priority: $priority | Type: $type"
+    log "INFO" "  Analysis: Phase=$phase | Priority=$priority | Type=$type | Confidence=$confidence%"
 
-    # Map to label names if needed
+    # Map to label names if Claude provided them
     local phase_label=""
     case "$phase" in
         "1-mvp") phase_label="phase-1-mvp" ;;
         "2-important") phase_label="phase-2-important" ;;
         "3-nice-to-have") phase_label="phase-3-nice-to-have" ;;
+        "4-advanced") phase_label="phase-4-advanced" ;;
     esac
 
     local priority_label=""
@@ -109,14 +126,14 @@ EOF
         "testing") type_label="type-testing" ;;
     esac
 
-    # Build label list
+    # Build label list (always add status label)
     local all_labels="status-in-progress"
     [ -n "$phase_label" ] && all_labels="$all_labels,$phase_label"
     [ -n "$priority_label" ] && all_labels="$all_labels,$priority_label"
     [ -n "$type_label" ] && all_labels="$all_labels,$type_label"
-    if [ -n "$labels" ]; then
-        all_labels="$all_labels,$labels"
-    fi
+
+    # Note: Remove duplicate status labels if any
+    all_labels=$(echo "$all_labels" | sed 's/status-in-progress,status-in-progress/status-in-progress/g')
 
     # Apply labels
     log "INFO" "  Applying labels: $all_labels"
@@ -140,17 +157,18 @@ EOF
         return 1
     fi
 
-    # Post analysis as comment
+    # Post analysis as comment (with proper formatting)
     local comment_body="🤖 **Automated Analysis**
 
-**Phase:** $phase
-**Priority:** $priority
-**Type:** $type
-**Confidence:** $confidence%
+| Field | Value |
+|-------|-------|
+| **Phase** | $phase |
+| **Priority** | $priority |
+| **Type** | $type |
+| **Confidence** | $confidence% |
+| **Reasoning** | $reasoning |
 
-**Reasoning:** $reasoning
-
-*Analyzed by Claude Code at $(date)*"
+*Analyzed by Claude Code CLI at $(date)*"
 
     log "INFO" "  Posting analysis comment"
     if gh issue comment "$issue_num" \
