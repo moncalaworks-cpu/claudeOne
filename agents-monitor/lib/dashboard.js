@@ -25,36 +25,11 @@ class Dashboard {
    */
   async init() {
     try {
-      // Create the blessed screen with terminal compatibility fixes
-      const screenOptions = {
-        smartCSR: true,
-        mouse: false, // Disable mouse to avoid terminal issues
-        title: 'Claude Code Agents Monitor',
-        useStyle: true,
-        dockBorders: true,
-        output: process.stdout, // Explicitly use stdout
-        input: process.stdin,   // Explicitly use stdin
-        altScreen: false        // Disable alternate screen buffer for better compatibility
-      };
-
-      // Check if we're in an interactive terminal with proper capabilities
-      const hasTerminal = process.stdout.isTTY && process.stdin.isTTY;
-
-      if (!hasTerminal) {
-        // Fallback: Use text-based output instead of blessed UI
-        process.stderr.write('⚠️  Not in interactive terminal - using text output mode\n');
-        process.stderr.write('Dashboard monitoring (text mode):\n');
-        process.stderr.write('- Run with no arguments to see help\n');
-        process.stderr.write('- Type "q" or Ctrl+C to quit\n');
-        this.screen = null;
-      } else {
-        this.screen = blessed.screen(screenOptions);
-
-        // Debug: Check terminal capabilities
-        if (this.screen.term) {
-          process.stderr.write(`Terminal: ${this.screen.term.name || 'unknown'}\n`);
-        }
-      }
+      // Use text-based output instead of blessed UI
+      // Blessed has terminal compatibility issues in many environments
+      // Text mode is simpler and works reliably across all terminals
+      process.stderr.write('📊 Dashboard running in text mode\n');
+      this.screen = null;
 
       // Create main layout
       this.createLayout();
@@ -217,6 +192,10 @@ class Dashboard {
       this.running = true;
       // Write to stderr to ensure message appears immediately and isn't buffered
       process.stderr.write('✅ Dashboard started\n');
+      process.stderr.write('\n========== AGENTS MONITORING DASHBOARD ==========\n');
+      process.stderr.write('Updating metrics every second...\n');
+      process.stderr.write('Press Ctrl+C to quit\n');
+      process.stderr.write('===================================================\n\n');
 
       // Initial update
       await this.updateDashboard();
@@ -310,8 +289,10 @@ class Dashboard {
       if (this.screen) {
         this.screen.render();
       } else {
-        // Text mode: print metrics periodically to stderr
-        process.stderr.write(`[${new Date().toISOString()}] Active Agents: ${agents.length}, Success Rate: ${metrics.successRate}%\n`);
+        // Text mode: print formatted metrics to stderr
+        const time = new Date().toLocaleTimeString();
+        const line = `[${time}] Agents: ${agents.length} | Success: ${metrics.successRate}% | Avg Time: ${metrics.avgExecutionTime}ms | Total Tokens: ${metrics.totalTokensUsed}`;
+        process.stderr.write(line + '\n');
       }
     } catch (error) {
       if (this.logsBox) {

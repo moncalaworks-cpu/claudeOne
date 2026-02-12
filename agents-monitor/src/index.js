@@ -31,7 +31,6 @@ program
   .option('--refresh <ms>', 'Refresh interval in milliseconds', 1000)
   .action(async (options) => {
     try {
-      // Write to stderr to ensure message appears immediately and isn't buffered
       process.stderr.write('🚀 Starting Agents Monitoring Dashboard...\n');
       const dashboard = new Dashboard(options);
       await dashboard.init();
