@@ -397,6 +397,20 @@ Enhancements and advanced monitoring for production deployments.
   - Added detection for String.prototype.bold and blessed-specific errors
 - **Verification:** ✅ Dashboard runs without crashes, all 5 integration tests pass with improved error detection
 
+#### REQ-011.5: Fix dashboard exiting immediately after rendering (Bug Fix)
+- **Description:** Dashboard was rendering UI briefly (visible as screen flash) but exiting immediately, making it unusable. User could see the flash but not interact with the dashboard.
+- **Status:** DONE ✅
+- **GitHub Issue:** #32
+- **Root Cause:**
+  - Node.js exits when event loop has no active handles, even with pending Promises
+  - process.stdin.resume() alone wasn't sufficient to keep loop active
+  - Promise that never resolves from start() wasn't enough without active event handles
+- **Fix Applied:**
+  - Added dummy 1-second interval using setInterval() to keep event loop active
+  - Marked intentionally-unused variable with eslint-disable comment
+  - Dashboard now stays running indefinitely until killed by user or signal
+- **Verification:** ✅ Dashboard displays and stays open in iTerm2, responds to Ctrl+C, all 5 tests pass
+
 #### REQ-014.1: Fix alert CLI commands routing (Bug Fix)
 - **Description:** Fix alert CLI commands (list, rules, stats, history) which were not routing correctly due to conflicting command definitions in Commander.js.
 - **Status:** DONE ✅
