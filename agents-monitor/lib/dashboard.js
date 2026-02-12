@@ -33,15 +33,28 @@ class Dashboard {
         useStyle: true,
         dockBorders: true,
         output: process.stdout, // Explicitly use stdout
-        input: process.stdin    // Explicitly use stdin
+        input: process.stdin,   // Explicitly use stdin
+        altScreen: false        // Disable alternate screen buffer for better compatibility
       };
 
-      // In test environment, disable alternate screen to allow output capture
-      if (process.env.NODE_ENV === 'test') {
-        screenOptions.altScreen = false;
-      }
+      // Check if we're in an interactive terminal with proper capabilities
+      const hasTerminal = process.stdout.isTTY && process.stdin.isTTY;
 
-      this.screen = blessed.screen(screenOptions);
+      if (!hasTerminal) {
+        // Fallback: Use text-based output instead of blessed UI
+        process.stderr.write('⚠️  Not in interactive terminal - using text output mode\n');
+        process.stderr.write('Dashboard monitoring (text mode):\n');
+        process.stderr.write('- Run with no arguments to see help\n');
+        process.stderr.write('- Type "q" or Ctrl+C to quit\n');
+        this.screen = null;
+      } else {
+        this.screen = blessed.screen(screenOptions);
+
+        // Debug: Check terminal capabilities
+        if (this.screen.term) {
+          process.stderr.write(`Terminal: ${this.screen.term.name || 'unknown'}\n`);
+        }
+      }
 
       // Create main layout
       this.createLayout();
@@ -61,6 +74,11 @@ class Dashboard {
    * Create the main dashboard layout
    */
   createLayout() {
+    // Skip layout creation if no screen (text mode)
+    if (!this.screen) {
+      return;
+    }
+
     // Title
     this.title = blessed.box({
       parent: this.screen,
@@ -160,6 +178,11 @@ class Dashboard {
    * Setup keyboard handlers
    */
   setupKeyboardHandlers() {
+    // Skip keyboard handlers if no screen (text mode)
+    if (!this.screen) {
+      return;
+    }
+
     // Quit
     this.screen.key(['q', 'C-c'], () => {
       this.running = false;
@@ -209,8 +232,10 @@ class Dashboard {
         }
       }, this.options.refreshInterval);
 
-      // Render the screen
-      this.screen.render();
+      // Render the screen if blessed is available
+      if (this.screen) {
+        this.screen.render();
+      }
 
       // Keep the process alive - CRITICAL for blessed to work
       // stdin.resume() keeps the event loop active for keyboard input
@@ -221,7 +246,9 @@ class Dashboard {
         process.on('SIGINT', () => {
           this.running = false;
           clearInterval(this.refreshInterval);
-          this.screen.destroy();
+          if (this.screen) {
+            this.screen.destroy();
+          }
           process.exit(0);
         });
       }
@@ -231,7 +258,9 @@ class Dashboard {
         process.on('SIGTERM', () => {
           this.running = false;
           clearInterval(this.refreshInterval);
-          this.screen.destroy();
+          if (this.screen) {
+            this.screen.destroy();
+          }
           process.exit(0);
         });
       }
@@ -277,10 +306,19 @@ class Dashboard {
       // Update logs
       this.updateLogs();
 
-      // Render
-      this.screen.render();
+      // Render if blessed is available
+      if (this.screen) {
+        this.screen.render();
+      } else {
+        // Text mode: print metrics periodically to stderr
+        process.stderr.write(`[${new Date().toISOString()}] Active Agents: ${agents.length}, Success Rate: ${metrics.successRate}%\n`);
+      }
     } catch (error) {
-      this.logsBox.log(`Error updating dashboard: ${error.message}`);
+      if (this.logsBox) {
+        this.logsBox.log(`Error updating dashboard: ${error.message}`);
+      } else {
+        process.stderr.write(`Error updating dashboard: ${error.message}\n`);
+      }
     }
   }
 
@@ -288,6 +326,10 @@ class Dashboard {
    * Update agents list panel
    */
   updateAgentsList(agents) {
+    if (!this.agentsList) {
+      return;
+    }
+
     this.agentsList.clearItems();
 
     if (agents.length === 0) {
@@ -308,6 +350,10 @@ class Dashboard {
    * Update metrics panel
    */
   updateMetrics(metrics) {
+    if (!this.metricsBox) {
+      return;
+    }
+
     const content = `
  Total: ${metrics.totalAgents} | Active: ${metrics.activeAgents} | Failed: ${metrics.failedAgents}
  Success Rate: ${metrics.successRate}%
@@ -322,6 +368,10 @@ class Dashboard {
    * Update performance chart
    */
   updatePerformance(metrics) {
+    if (!this.perfBox) {
+      return;
+    }
+
     const chartContent = `
  Execution Time: ${this.getBar(metrics.avgExecutionTime, 5000)}
  Token Usage: ${this.getBar(metrics.totalTokensUsed, 100000)}
@@ -369,8 +419,15 @@ Status Indicators:
   🟡 - Agent idle
     `.trim();
 
-    this.logsBox.log(help);
-    this.screen.render();
+    if (this.logsBox) {
+      this.logsBox.log(help);
+    } else {
+      process.stderr.write(help + '\n');
+    }
+
+    if (this.screen) {
+      this.screen.render();
+    }
   }
 
   /**
