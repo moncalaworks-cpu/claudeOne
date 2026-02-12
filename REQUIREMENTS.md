@@ -211,6 +211,31 @@ Features that add value but aren't essential for launch.
 
 ---
 
+### Phase 4: Advanced Features (Future Extensions)
+
+Enhancements and advanced monitoring for production deployments.
+
+#### REQ-011: Agent Monitoring Dashboard for Real-time Performance Tracking
+- **Description:** Create an interactive dashboard for monitoring active Claude Code agents in real-time, showing performance metrics, execution logs, and resource utilization.
+- **Acceptance Criteria:**
+  - [ ] Dashboard displays active agents and their status
+  - [ ] Real-time performance metrics (execution time, token usage, success rate)
+  - [ ] Log viewer with filtering and search
+  - [ ] Resource utilization charts (CPU, memory)
+  - [ ] Alert configuration for errors and slowdowns
+  - [ ] Integration with GitHub Issues for agent context
+  - [ ] Web-based interface or CLI dashboard option
+  - [ ] Documentation for setup and usage
+- **Dependencies:** REQ-001 (Agentic Workflows Guide), REQ-005 (Deployment Checklist)
+- **Type:** Monitoring/Observability
+- **Status:** NOT_STARTED
+- **GitHub Issue:** #15
+- **Estimated Effort:** High
+- **Target Date:** [Future]
+- **Related Memory:** See `scheduled-automation-setup.md` - This will test the automated analyzer on a monitoring-focused requirement
+
+---
+
 ## Dependencies & Constraints
 
 ### External Dependencies
