@@ -1,0 +1,167 @@
+# Claude Code Best Practices Rules
+
+## Core Guidelines
+You have access to comprehensive best practices documentation in the `files/` directory:
+- `files/CRAFT_Prompt_Engineering_Guide_for_Claude.md` - Prompt engineering best practices
+- `files/Claude_Code_Agentic_Workflows_Guide.md` - Implementation patterns and MCP integration
+- `files/ways_to_share_with_code.md` - Integration methods
+
+Always reference these guides when:
+- Writing prompts to Claude
+- Designing system architectures
+- Implementing error handling
+- Setting up state management
+- Integrating external APIs/MCPs
+- Creating documentation
+
+## CRAFT Framework (Apply to All Prompts)
+
+When constructing prompts, always include:
+
+### Context (C)
+- Provide relevant background information and business context
+- State constraints, limitations, and prerequisites
+- Define success criteria upfront
+- Mention any external factors affecting the task
+- Reference any attached documents or knowledge bases
+
+### Role (R)
+- Define specific persona or expertise Claude should adopt
+- Include relevant experience level and credentials
+- Clarify decision-making authority or constraints
+- Avoid vague expertise definitions
+
+### Action (A)
+- Use imperative verbs (analyze, create, compare, evaluate, explain)
+- Break complex actions into numbered sub-steps
+- Include conditional logic if needed
+- Specify validation or verification steps
+- Always request explicit assumption disclosure
+
+### Format (F)
+- Specify output type (report, code, table, checklist, etc.)
+- Define length constraints or section requirements
+- Request specific formatting elements (headers, bullet points, tables)
+- Include citation requirements with section/page references
+
+### Tone (T)
+- Identify the audience and reading level
+- Define formality level and voice characteristics
+- Specify how to handle uncertainty and gaps in knowledge
+- Include transparency requirements about limitations
+
+## Hallucination Mitigation (Critical)
+
+For ALL prompts requesting information or analysis:
+
+1. **Acknowledge Knowledge Cutoff**: Claude's training data ends January 2025. Request web search for current info.
+2. **Request Explicit Uncertainty**: Use phrases like "If unsure, state 'I'm not certain about this' rather than guess"
+3. **Demand Citations**: "Cite specific sources, sections, or quotes when referencing provided documents"
+4. **Request Confidence Levels**: Ask for High/Medium/Low confidence ratings with reasoning
+5. **Step-by-Step Reasoning**: "Explain your reasoning step-by-step so assumptions are visible"
+6. **Flag Assumptions**: "List all assumptions underlying recommendations"
+7. **Use Web Search**: For current data, recent releases, or breaking news beyond Jan 2025
+
+## MCP Integration Best Practices
+
+When implementing external integrations:
+- Always include OAuth/authentication setup details
+- Implement exponential backoff for rate limiting
+- Never log full credentials or sensitive data
+- Include example configurations before implementation
+- Provide comprehensive error handling with recovery strategies
+- Add monitoring and state persistence
+
+## Code Quality Standards
+
+For all code generation:
+- Include comprehensive error handling with try/except blocks
+- Implement retry logic with exponential backoff
+- Use structured logging with timestamps
+- Persist state to files for multi-step operations
+- Include input validation at system boundaries
+- Add docstrings with confidence levels
+- Never hardcode API keys or secrets
+- Use environment variables for all credentials
+
+## State Management & Persistence
+
+For agents or multi-step operations:
+- Implement persistent state storage (JSON files minimum)
+- Track last execution timestamp
+- Counter for successful/failed operations
+- Clear recovery procedures if state is corrupted
+
+## Logging Standards
+
+All agents must include:
+- Structured logging with timestamps
+- Log rotation for file-based logs (10MB max, 5 backups)
+- Separate console and file handlers
+- Clear ERROR/WARNING/INFO levels
+- No sensitive data in logs
+
+## Security Requirements
+
+Always enforce:
+- [ ] API keys stored in environment variables, never in code
+- [ ] .env files added to .gitignore
+- [ ] Minimal OAuth scopes (only required permissions)
+- [ ] Regular credential rotation
+- [ ] Audit logging for sensitive operations
+- [ ] No credentials in version control
+
+## Testing & Validation
+
+For implementation tasks:
+- Include unit tests with mocking where appropriate
+- Test error handling paths
+- Validate external API responses
+- Include test data or fixtures
+
+## When in Doubt
+
+Reference these specific sections:
+- **CRAFT examples**: See CRAFT_Prompt_Engineering_Guide_for_Claude.md Part 5
+- **Error handling patterns**: See Claude_Code_Agentic_Workflows_Guide.md Part 6
+- **MCP authentication**: See Claude_Code_Agentic_Workflows_Guide.md Parts 3-4
+- **Best practices checklist**: See Claude_Code_Agentic_Workflows_Guide.md Part 9
+
+## Project Structure (For Code Generation)
+
+When creating new agents or workflows, use this structure:
+
+```
+project/
+├── docs/                    # Documentation
+├── agents/                  # Agent implementations
+├── mcps/                    # MCP configurations
+├── lib/                     # Utilities (state_manager.py, logger.py, error_handlers.py)
+├── tests/                   # Unit tests
+├── examples/                # Working examples
+├── logs/                    # Runtime logs
+├── .env                     # Secrets (gitignored)
+├── .gitignore
+├── agent-config.yaml        # Configuration
+└── README.md
+```
+
+## Confidence Levels
+
+Always indicate confidence in outputs:
+- **HIGH**: Based on established patterns, documentation, or well-tested code
+- **MEDIUM**: Based on industry best practices or general patterns that may vary
+- **LOW**: Based on limited data, emerging patterns, or areas requiring validation
+
+Include confidence levels in:
+- Code comments (especially for API interactions)
+- Documentation of assumptions
+- Estimates or projections
+- External API usage guidance
+
+---
+
+**Last Updated**: January 17, 2026
+**Version**: 1.0
+
+These rules apply to all interactions. Reference the documentation files as needed.

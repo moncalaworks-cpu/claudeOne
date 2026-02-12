@@ -1,0 +1,318 @@
+# Project Requirements
+
+**Last Updated:** 2026-02-12
+**Project Version:** 1.0
+**Status:** PLANNING
+**Owner:** [Your name]
+
+---
+
+## Overview
+
+[Describe what this project solves in 2-3 sentences. What problem does it address? Who are the users?]
+
+**Example:** This project provides a Claude Code development environment and best practices documentation for building agentic workflows with MCP integrations. It serves as a template for teams building autonomous AI agents that interact with external services.
+
+---
+
+## Strategic Goals
+
+- [Business goal 1]
+- [Business goal 2]
+- [Business goal 3]
+
+**Example:**
+- Provide comprehensive guides for agentic workflow implementation
+- Create reusable templates and patterns for common agent use cases
+- Document deployment best practices and security considerations
+
+---
+
+## Requirements by Priority
+
+### Phase 1: MVP (Must Have)
+
+Core features needed for initial launch. These block the project from being usable.
+
+#### REQ-001: Comprehensive Agentic Workflows Guide
+- **Description:** Create a complete guide covering agent architecture, MCP setup, error handling, state management, and deployment for developers building autonomous agents.
+- **Acceptance Criteria:**
+  - [ ] Guide covers agent initialization and lifecycle
+  - [ ] Gmail MCP integration documented with examples
+  - [ ] GitHub MCP integration documented with examples
+  - [ ] Error handling patterns explained with code samples
+  - [ ] State management approaches documented
+  - [ ] Deployment checklist included
+  - [ ] Security best practices documented
+- **Dependencies:** None
+- **Constraints:** Must be clear for intermediate developers; must include runnable examples
+- **Implementation Notes:** See existing guides in `my-agentic-code-project/docs/`
+- **Status:** IN_PROGRESS
+- **Related Memory:** See `architecture.md` for documentation structure decisions
+- **Estimated Effort:** [High/Medium/Low]
+- **Target Date:** 2026-03-01
+
+#### REQ-002: CRAFT Prompt Engineering Framework
+- **Description:** Document the CRAFT (Context, Role, Action, Format, Tone) framework for structuring effective prompts to Claude for agentic tasks.
+- **Acceptance Criteria:**
+  - [ ] Framework definition and rationale documented
+  - [ ] Each component (C, R, A, F, T) explained with examples
+  - [ ] Common mistakes and best practices listed
+  - [ ] Template provided for users to copy and adapt
+  - [ ] Real-world examples from agent use cases
+- **Dependencies:** None
+- **Constraints:** Must work for both simple and complex prompts
+- **Implementation Notes:** See existing guide: `Claude_Code_Agentic_Workflows_Guide.md` (Part 1)
+- **Status:** IN_PROGRESS
+- **Related Memory:** See `patterns.md` for prompt patterns discovered
+- **Estimated Effort:** Medium
+- **Target Date:** 2026-02-28
+
+#### REQ-003: Best Practices Rules (Cursorrules)
+- **Description:** Create and maintain `.cursorrules` file documenting best practices rules that Claude Code automatically applies to this repository.
+- **Acceptance Criteria:**
+  - [ ] CRAFT framework rules documented
+  - [ ] Hallucination mitigation strategies outlined
+  - [ ] MCP integration patterns specified
+  - [ ] Security requirements documented
+  - [ ] State management patterns specified
+  - [ ] Logging and monitoring standards defined
+  - [ ] Code organization conventions specified
+- **Dependencies:** None
+- **Constraints:** Rules must be actionable and auto-applicable
+- **Status:** IN_PROGRESS
+- **Related Memory:** See `conventions.md` for project conventions
+- **Estimated Effort:** Medium
+- **Target Date:** 2026-02-25
+
+#### REQ-004: Environment Setup & Configuration
+- **Description:** Provide templates and setup scripts for developers to quickly initialize their environment with required credentials, MCP configurations, and Claude Code settings.
+- **Acceptance Criteria:**
+  - [ ] `.env.template` file created with all required variables
+  - [ ] `setup-claude-defaults.sh` script sets up CLI aliases
+  - [ ] `.claude/settings.local.json` configured for common use cases
+  - [ ] MCP configuration templates created (`gmail_config.json`, `github_config.json`)
+  - [ ] Setup instructions documented
+  - [ ] Common configuration errors documented
+- **Dependencies:** None
+- **Constraints:** Must work on macOS, Linux, and Windows (Git Bash)
+- **Implementation Notes:** See `my-agentic-code-project/.env.template`
+- **Status:** IN_PROGRESS
+- **Related Memory:** See `tools.md` for tool configuration details
+- **Estimated Effort:** Medium
+- **Target Date:** 2026-02-28
+
+---
+
+### Phase 2: Important (Should Have)
+
+Features that improve usability and are valuable but not blocking.
+
+#### REQ-005: Pre-Deployment Validation Checklist
+- **Description:** Create comprehensive checklist (100+ items) that teams use before deploying agents to production.
+- **Acceptance Criteria:**
+  - [ ] Code quality section (error handling, testing, documentation)
+  - [ ] State management validation section
+  - [ ] Security checklist (credentials, OAuth, audit logging)
+  - [ ] Monitoring and logging validation
+  - [ ] Runbook and recovery procedures section
+  - [ ] Team review and approval section
+  - [ ] Printable/checkable format
+- **Dependencies:** REQ-001 (needs to reference patterns from guide)
+- **Status:** NOT_STARTED
+- **Related Memory:** See `architecture.md` for deployment strategy
+- **Estimated Effort:** Medium
+- **Target Date:** 2026-03-15
+
+#### REQ-006: Working Code Examples
+- **Description:** Provide 3-5 complete, runnable examples demonstrating increasing complexity: simple email processor, GitHub workflow monitor, multi-step automation.
+- **Acceptance Criteria:**
+  - [ ] Simple email processor example (beginner level)
+  - [ ] GitHub Actions monitor example (intermediate)
+  - [ ] Multi-tool orchestration example (advanced)
+  - [ ] All examples have clear setup instructions
+  - [ ] All examples include error handling and logging
+  - [ ] All examples include unit tests
+  - [ ] README for each example explaining key concepts
+- **Dependencies:** REQ-001, REQ-004
+- **Status:** NOT_STARTED
+- **Related Memory:** See `patterns.md` for implementation patterns
+- **Estimated Effort:** High
+- **Target Date:** 2026-03-30
+
+#### REQ-007: Quick Reference Card
+- **Description:** Create a one-page (printable) quick reference guide with common patterns, commands, and file locations.
+- **Acceptance Criteria:**
+  - [ ] Common Claude Code commands listed
+  - [ ] Git workflow quick reference
+  - [ ] File structure cheat sheet
+  - [ ] Tool commands reference
+  - [ ] Troubleshooting quick links
+  - [ ] Fits on single printed page
+- **Dependencies:** None
+- **Status:** NOT_STARTED
+- **Related Memory:** See `tools.md` for command reference
+- **Estimated Effort:** Low
+- **Target Date:** 2026-03-10
+
+---
+
+### Phase 3: Nice to Have (Could Have)
+
+Features that add value but aren't essential for launch.
+
+#### REQ-008: Interactive Workshop Template
+- **Description:** Create a structure for running workshops that teach teams how to build their first agent using this template.
+- **Acceptance Criteria:**
+  - [ ] Workshop outline (timing, activities, learning outcomes)
+  - [ ] Slides template
+  - [ ] Hands-on lab exercises
+  - [ ] Facilitator guide
+- **Status:** NOT_STARTED
+- **Estimated Effort:** High
+- **Target Date:** [Future]
+
+#### REQ-009: Integration Examples
+- **Description:** Provide examples of agents integrating with services beyond Gmail/GitHub (Slack, Jira, databases, etc.).
+- **Acceptance Criteria:**
+  - [ ] Slack integration example
+  - [ ] Jira integration example
+  - [ ] Database integration patterns
+- **Dependencies:** REQ-006 (working examples framework)
+- **Status:** NOT_STARTED
+- **Estimated Effort:** High
+- **Target Date:** [Future]
+
+#### REQ-010: Video Tutorials
+- **Description:** Record 5-10 short videos walking through common tasks and troubleshooting.
+- **Status:** NOT_STARTED
+- **Estimated Effort:** High
+- **Target Date:** [Future]
+
+---
+
+## Dependencies & Constraints
+
+### External Dependencies
+- **Claude API** (Anthropic) - Required for agent execution
+- **Gmail API** (Google) - Required for email integration examples
+- **GitHub API** (GitHub) - Required for GitHub integration examples
+- **Claude Code CLI** - Required for development
+
+### Internal Dependencies
+```
+REQ-001 (Guide)
+  ↓
+REQ-005 (Deployment Checklist)
+REQ-006 (Examples)
+
+REQ-002 (CRAFT Framework)
+  → Referenced by REQ-001
+
+REQ-003 (Cursorrules)
+  → Applied to all requirements
+
+REQ-004 (Environment Setup)
+  → Used by REQ-006 (Examples)
+```
+
+### Constraints
+- **Audience:** Intermediate to advanced developers
+- **Documentation:** Must include working code examples
+- **Testing:** All examples must have test coverage
+- **Security:** No hardcoded secrets; credentials from environment only
+- **Compatibility:** Must work on macOS, Linux, and Windows
+- **Updates:** Guides must reflect latest Claude models and API versions
+
+### Known Risks
+- **Risk:** Claude API changes could break examples
+  - **Mitigation:** Version-pin examples to specific model; document upgrade path
+  - **Owner:** [Your name]
+
+- **Risk:** Gmail/GitHub API rate limits not documented
+  - **Mitigation:** Add rate limit handling patterns to guide; test with realistic loads
+  - **Owner:** [Your name]
+
+- **Risk:** Security vulnerabilities in example code could teach bad practices
+  - **Mitigation:** Security review of all code examples; use security scanning tool
+  - **Owner:** [Your name]
+
+---
+
+## Success Metrics
+
+- [ ] All REQ-001 to REQ-004 acceptance criteria met
+- [ ] Documentation achieves 90%+ clarity score from external reviewers
+- [ ] Example code runs without errors on first attempt
+- [ ] Security scanning reports zero HIGH severity issues
+- [ ] At least 3 external developers successfully deploy first agent using template
+- [ ] Documentation has fewer than 5 reported issues in first month
+
+---
+
+## Timeline & Milestones
+
+| Milestone | Target Date | Completion | Notes |
+|-----------|------------|------------|-------|
+| MVP Requirements (REQ-001 to REQ-004) | 2026-03-01 | 0% | Core deliverables |
+| Phase 2 Complete (REQ-005 to REQ-007) | 2026-03-30 | 0% | Enhancement features |
+| Initial Release | 2026-04-01 | 0% | Ready for external use |
+| Phase 3 Features | 2026-06-01 | 0% | Optional enhancements |
+
+---
+
+## Status Definitions
+
+- **NOT_STARTED:** Requirement approved but work hasn't begun
+- **IN_PROGRESS:** Active development underway
+- **BLOCKED:** Work stopped due to dependency or issue
+- **REVIEW:** Completed but awaiting approval
+- **DONE:** Accepted and complete
+
+---
+
+## Changelog
+
+### v1.0 (2026-02-12)
+- Initial requirements document created
+- Phase 1 (MVP) requirements defined
+- Phase 2 and Phase 3 requirements sketched
+
+### v0.1 (2026-02-12)
+- Template created
+
+---
+
+## How to Use This Document
+
+1. **For Development:** Reference REQ-XXX codes when creating tasks or commits
+2. **For Planning:** Track completion percentage per phase
+3. **For Discussion:** Share specific requirements with stakeholders
+4. **For Memory:** Link from `MEMORY.md` when discovering patterns or making decisions
+
+**Example reference:**
+- In commit: "Implement REQ-001 Part 3: Gmail MCP integration"
+- In MEMORY.md: "Related Requirement: REQ-001 (Agentic Workflows Guide)"
+- In code comment: "See REQ-004 for credential handling requirements"
+
+---
+
+## Questions & Clarifications
+
+[Use this section to track open questions about requirements]
+
+**Q:** Should examples include pytest or unittest?
+**A:** [To be determined]
+
+**Q:** What's the minimum Python version?
+**A:** [To be determined]
+
+---
+
+## Sign-Off
+
+| Role | Name | Date | Approval |
+|------|------|------|----------|
+| Product | [Name] | [Date] | [ ] |
+| Tech Lead | [Name] | [Date] | [ ] |
+| Security | [Name] | [Date] | [ ] |
