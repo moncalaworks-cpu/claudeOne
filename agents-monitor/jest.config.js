@@ -16,9 +16,12 @@ module.exports = {
     }
   },
   testMatch: [
-    '**/tests/**/*.test.js',
-    '**/?(*.)+(spec|test).js'
+    '<rootDir>/tests/**/*.test.js',
+    '<rootDir>/tests/**/*.spec.js'
   ],
+  // Explicitly roots the test discovery to tests directory
+  // This prevents accidental test discovery in node_modules or other locations
+  // and ensures consistent behavior across different environments
   testPathIgnorePatterns: [
     '/node_modules/',
     '/dist/'
