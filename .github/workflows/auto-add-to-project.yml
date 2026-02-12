@@ -1,0 +1,29 @@
+name: Auto-Add to Projects Board
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  add-to-project:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: read
+      contents: read
+    steps:
+      - name: Add issue to Projects board
+        run: |
+          ISSUE_NUM="${{ github.event.issue.number }}"
+          TITLE="${{ github.event.issue.title }}"
+
+          # Check if it's a REQ-XXX issue
+          if [[ "$TITLE" =~ REQ-[0-9]+ ]]; then
+            echo "Adding issue #$ISSUE_NUM to Projects board..."
+
+            # Use GitHub CLI to add to project
+            gh project item-add 1 \
+              --owner moncalaworks-cpu \
+              --url "https://github.com/moncalaworks-cpu/claudeOne/issues/$ISSUE_NUM" || echo "Note: May need project token scope"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

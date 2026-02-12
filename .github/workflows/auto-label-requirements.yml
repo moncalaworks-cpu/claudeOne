@@ -28,10 +28,14 @@ jobs:
             # Phase 3: Nice to Have (REQ-008 to REQ-010)
             gh issue edit $ISSUE_NUM --add-label "phase-3-nice-to-have" --add-label "type-feature" --add-label "status-ready"
             echo "Added Phase 3 labels"
+          elif [[ "$TITLE" =~ REQ-0[1-9][0-9] ]] || [[ "$TITLE" =~ REQ-[0-9]{3} ]]; then
+            # Phase 4+: Future requirements (REQ-011 and beyond)
+            gh issue edit $ISSUE_NUM --add-label "phase-4-advanced" --add-label "type-feature" --add-label "status-ready"
+            echo "Added Phase 4+ labels"
           fi
 
           # Add type-documentation if title mentions docs/guide/documentation
-          if [[ "$TITLE" =~ [Dd]oc|[Gg]uide|[Rr]unbook ]]; then
+          if [[ "$TITLE" =~ [Dd]oc|[Gg]uide|[Rr]unbook|[Mm]onitoring|[Dd]ashboard ]]; then
             gh issue edit $ISSUE_NUM --add-label "type-documentation"
             echo "Added documentation label"
           fi
