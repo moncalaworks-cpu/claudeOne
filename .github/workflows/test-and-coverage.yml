@@ -37,9 +37,13 @@ jobs:
         run: npm run lint
         continue-on-error: true
 
+      - name: Debug: List test files Jest discovered
+        working-directory: agents-monitor
+        run: npx jest --listTests --no-coverage || true
+
       - name: Run tests
         working-directory: agents-monitor
-        run: npm test -- --coverage --watchAll=false
+        run: npx jest --coverage --watchAll=false
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
