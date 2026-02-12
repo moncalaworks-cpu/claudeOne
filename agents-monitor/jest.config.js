@@ -29,5 +29,9 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
   verbose: true,
   bail: false,
-  errorOnDeprecated: true
+  errorOnDeprecated: true,
+  // Force Jest to exit even if there are open handles
+  // This is necessary because the keep-alive interval in dashboard tests
+  // and subprocess handling can leave event handles active
+  forceExit: true
 };
