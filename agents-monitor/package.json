@@ -10,7 +10,13 @@
     "start": "node src/index.js",
     "dev": "node src/index.js --dev",
     "test": "jest",
-    "lint": "eslint src/ lib/"
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:ci": "jest --ci --coverage --maxWorkers=2",
+    "lint": "eslint src/ lib/",
+    "lint:fix": "eslint src/ lib/ --fix",
+    "pretest": "npm run lint",
+    "precommit": "npm run lint && npm test"
   },
   "keywords": [
     "claude",
